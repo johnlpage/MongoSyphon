@@ -193,14 +193,15 @@ Please report any bugs of issues you find.
 This is released with an Apache 2.0 license.
 
 ## Command line
-
+```
 Usage: java -jar MongoSyphon.jar [args]
 
 Args:
    -c <config file>
    -h <help>
    -n <new output config>
-  
+```
+
 ## Config Files
 
 ### Nature
