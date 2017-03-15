@@ -1,0 +1,42 @@
+2017-03-15 10:07:48.353 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:27 - MongoSyphon Version 0.1.1
+2017-03-15 10:07:48.359 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-03-15 10:07:56.385 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:27 - MongoSyphon Version 0.1.1
+2017-03-15 10:07:56.389 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-03-15 10:07:56.420 [main] ERROR c.j.mongosyphon.JobDescription:35 - Expected a ',' or '}' at 360 [character 8 line 17]
+2017-03-15 10:16:34.363 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:27 - MongoSyphon Version 0.1.1
+2017-03-15 10:16:34.368 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-03-15 10:16:35.180 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@436a4e4b: SELECT * FROM owner
+2017-03-15 10:16:35.184 [main] ERROR c.j.mongosyphon.DocumentGenerator:29 - Cannot find section named 'petsection' in config - aborting
+2017-03-15 10:16:55.783 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:27 - MongoSyphon Version 0.1.1
+2017-03-15 10:16:55.788 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-03-15 10:16:56.457 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@6295d394: SELECT * FROM owner
+2017-03-15 10:16:56.460 [main] ERROR c.j.mongosyphon.DocumentGenerator:29 - Cannot find section named 'petsection' in config - aborting
+2017-03-15 10:18:08.653 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:27 - MongoSyphon Version 0.1.1
+2017-03-15 10:18:08.657 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-03-15 10:18:08.676 [main] ERROR c.j.mongosyphon.JobDescription:35 - Expected a ',' or '}' at 607 [character 2 line 35]
+2017-03-15 10:18:23.521 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:27 - MongoSyphon Version 0.1.1
+2017-03-15 10:18:23.526 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-03-15 10:18:24.112 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@6295d394: SELECT * FROM owner
+2017-03-15 10:18:24.119 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@5c1a8622: SELECT * FROM pet where ownerid = 1
+2017-03-15 10:18:24.128 [main] ERROR c.j.mongosyphon.RDBMSConnection:124 - Unknown column 'ownerid' in 'where clause'
+2017-03-15 10:18:39.610 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:27 - MongoSyphon Version 0.1.1
+2017-03-15 10:18:39.615 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-03-15 10:18:40.215 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@6295d394: SELECT * FROM owner
+2017-03-15 10:18:40.222 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@5c1a8622: SELECT * FROM pet where petid = 1
+2017-03-15 10:18:40.229 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@b62fe6d: SELECT * from species where speciedid = 1
+2017-03-15 10:18:40.236 [main] ERROR c.j.mongosyphon.RDBMSConnection:124 - Unknown column 'speciedid' in 'where clause'
+2017-03-15 10:18:51.542 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:27 - MongoSyphon Version 0.1.1
+2017-03-15 10:18:51.547 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-03-15 10:18:52.133 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@6295d394: SELECT * FROM owner
+2017-03-15 10:18:52.141 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@5c1a8622: SELECT * FROM pet where petid = 1
+2017-03-15 10:18:52.147 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@b62fe6d: SELECT * from species where speciesid = 1
+2017-03-15 10:18:52.152 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@5c1a8622: SELECT * FROM pet where petid = 2
+2017-03-15 10:18:52.153 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@b62fe6d: SELECT * from species where speciesid = 1
+2017-03-15 10:21:45.532 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:27 - MongoSyphon Version 0.1.1
+2017-03-15 10:21:45.536 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-03-15 10:21:46.139 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@6295d394: SELECT * FROM owner
+2017-03-15 10:21:46.146 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@5c1a8622: SELECT * FROM pet where owner = 1
+2017-03-15 10:21:46.153 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@b62fe6d: SELECT * from species where speciesid = 1
+2017-03-15 10:21:46.155 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@b62fe6d: SELECT * from species where speciesid = 1
+2017-03-15 10:21:46.157 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@5c1a8622: SELECT * FROM pet where owner = 2
+2017-03-15 10:21:46.158 [main] INFO  c.j.mongosyphon.RDBMSConnection:116 - executing com.mysql.jdbc.JDBC42PreparedStatement@b62fe6d: SELECT * from species where speciesid = 2
