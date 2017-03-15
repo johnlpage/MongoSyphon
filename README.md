@@ -188,7 +188,7 @@ switched to db sdemo
 
 These will improve over time but usage is **at your own risk** and there are no implied warranties or promises it won't eat your data or lie to you.
 
-Please report any bugs of issies you find.
+Please report any bugs of issues you find.
 
 This is released with an Apache 2.0 license.
 
@@ -196,17 +196,17 @@ This is released with an Apache 2.0 license.
 
 ### Nature
 
-MongoSyphon is driven from JSON format configuration files. Early protypes used YAML configuration files however this resulted in embedding JSON in YAML and was ultimately less readable. This also lends itself to storing the ETL configurations inside MongoDB itself is desired.
+MongoSyphon is driven from JSON format configuration files. Early prototypes used YAML configuration files however this resulted in embedding JSON in YAML and was ultimately less readable. This also lends itself to storing the ETL configurations inside MongoDB itself if desired.
 
 Each configuraton file defines a complete ETL process. At this time that is either an insert, update or upsert into a single MongoDB collection with documents generated from one or more relational tables.
 
-In future parallel generation of codepentand records into multiple collections to generate more 'relational' data in MongoDB may also be supported.
+In future parallel generation of codepentant records into multiple collections to generate more 'relational' data in MongoDB may also be supported.
 
 
 ###Config Format
 
 #### Connection Details
-Each config file minimally includes, as top level elements the connection details for the RDBMS and for MongoDB. Connection to the RDBMS is via JDBC and s suitable JDBC Driver must be in your classpath. JDBC drivers for MySQL and Prostgres are included in the JAR and the Maven build file.
+Each config file minimally includes, as top level elements, the connection details for the RDBMS and for MongoDB. Connection to the RDBMS is via JDBC and a suitable JDBC Driver must be in your classpath. JDBC drivers for MySQL and Prostgres are included in the JAR and the Maven build file.
 
 The connection part of a config looks like this:
 
