@@ -90,7 +90,7 @@ mysql> show tables;
 mysql> exit
 ```
 
-Now we have a three table schema each _owner_ havs 0 or more pets, each _pet_ has exactly one _species_ from a small list.
+Now we have a three table schema each _owner_ has 0 or more pets, each _pet_ has exactly one _species_ from a small list.
 
 ```
 >cat owners.js
