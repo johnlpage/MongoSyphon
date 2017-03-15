@@ -1,8 +1,6 @@
 # MongoSyphon
 
-
-
-##Introduction
+## Introduction
 
 MongoSyphon is an Extract/Transform/Load (ETL) Engine designed specifically to transform and transfer data from Relational databases such as MySQL, Postgres and Oracle to document structures in MongoDB.
 
@@ -180,7 +178,7 @@ switched to db sdemo
 
 
 
-##WARNING Version 0.0.1
+## WARNING Version 0.0.1
 
 **MongoSyphon is an alpha stage, open-source tool and has the following characteristics**
 
@@ -194,9 +192,9 @@ Please report any bugs of issies you find.
 
 This is released with an Apache 2.0 license.
 
-##Config Files
+## Config Files
 
-###Nature
+### Nature
 
 MongoSyphon is driven from JSON format configuration files. Early protypes used YAML configuration files however this resulted in embedding JSON in YAML and was ultimately less readable. This also lends itself to storing the ETL configurations inside MongoDB itself is desired.
 
