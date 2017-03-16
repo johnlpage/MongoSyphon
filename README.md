@@ -192,6 +192,16 @@ Please report any bugs of issues you find.
 
 This is released with an Apache 2.0 license.
 
+## Command line
+```
+Usage: java -jar MongoSyphon.jar [args]
+
+Args:
+   -c <config file>
+   -h <help>
+   -n <new output config>
+```
+
 ## Config Files
 
 ### Nature
@@ -203,7 +213,7 @@ Each configuraton file defines a complete ETL process. At this time that is eith
 In future parallel generation of codepentant records into multiple collections to generate more 'relational' data in MongoDB may also be supported.
 
 
-###Config Format
+### Config Format
 
 #### Connection Details
 Each config file minimally includes, as top level elements, the connection details for the RDBMS and for MongoDB. Connection to the RDBMS is via JDBC and a suitable JDBC Driver must be in your classpath. JDBC drivers for MySQL and Prostgres are included in the JAR and the Maven build file.
@@ -613,6 +623,10 @@ To do this we can use an aggregation pipeline or a view built on one but that wi
 In each document (owner) we can add a top level field (maxpetid) calculated using it's own section on initial load and using $max on subsequent updates. We can index and sort on this as we are doing above for _id. This is the current best approach. but needs another field and index to support it.
 
 We can run an additional top level update to calculate and retain the max value of *petid* in a different collection , as long as we can specify a collection for the Mongo Query. This shoudl be bound into the same config though once multiple parallel conversion are allowed.
+
+### New Config Generation
+
+If you create a config file with only the connection parameters in it and supply it with `-c config` then using the `-n <outfile>` flag will generate a skeleton config with a section for each table in the database. This can save on transcription errors.
 
 
 ### Logging and output
