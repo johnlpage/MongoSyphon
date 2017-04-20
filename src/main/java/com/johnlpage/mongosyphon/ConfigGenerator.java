@@ -13,8 +13,7 @@ import java.util.Map;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -66,11 +65,6 @@ public class ConfigGenerator {
 			System.exit(1);
 		}
 
-
-		DumperOptions options = new DumperOptions();
-		options.setAllowReadOnlyProperties(true);
-		options.setPrettyFlow(true);
-		options.setDefaultFlowStyle(FlowStyle.BLOCK);
 
 		
 		String configjs = configData.toJson();

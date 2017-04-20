@@ -74,12 +74,12 @@ public class DocumentGenerator {
 		}
 
 		boolean found = false;
-		// In MERGE mode, we want to look at eaach row and see if we want it
-		// If it's < the value we want we ignore and take the enxt one
+		// In MERGE mode, we want to look at each row and see if we want it
+		// If it's < the value we want we ignore and take the next one
 		// If it's the value we want we use it
 		// If it's > the value we want we push it back on the cursor, but
-		// trickery in
-		// RDBMSConnectyion
+		// tricky in RDBMSConnection
+		
 		while (section.containsKey("mergeon") && found == false) {
 			String mergeField = section.getString("mergeon");
 			// Row is the data below

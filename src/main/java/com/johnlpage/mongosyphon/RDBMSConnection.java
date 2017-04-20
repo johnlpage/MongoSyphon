@@ -87,6 +87,8 @@ public class RDBMSConnection {
 					}
 					if (o.getClass() == String.class) {
 						stmt.setString(count, (String) o);
+					} else if (o.getClass() == Date.class) {
+						stmt.setDate(count, (Date) o);
 					} else if (o.getClass() == Integer.class) {
 						stmt.setInt(count, (Integer) o);
 		

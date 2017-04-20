@@ -36,6 +36,7 @@ public class MongoConnection {
 	{
 		logger = LoggerFactory.getLogger(MongoSyphon.class);
 		this.target = target;
+		logger.info("Connecting to " + target.getMongoURI() );
 		mongoClient = new MongoClient(new MongoClientURI(target.getMongoURI()));
 		db = mongoClient.getDatabase(target.getMongoDatabase());
 		collection = db.getCollection(target.getMongoCollection());
@@ -69,9 +70,7 @@ public class MongoConnection {
 		if(doc.containsKey("$find")) {
 			find = (Document)doc.get("$find");
 			doc.remove("$find");
-			System.out.println(find.toJson());
-			System.out.println(doc.toJson());
-			
+		
 			ops.add(new UpdateOneModel<Document>(find,doc,uo));
 		} else {
 			logger.error("No $find section defined");
