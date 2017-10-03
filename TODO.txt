@@ -1,0 +1,21 @@
+
+Read from Mongo as well as SQL - Aggregation or Query
+  - Find [X]
+  - Sort [X]
+  - Project [X]
+  - Aggregate [X]
+  
+JSON and XML Output (Various XML formats)
+
+Change top level Mongo Query to a standard section
+
+connection per section
+
+
+Run as Web Service option
+  - API Keys and QUotas for service
+  
+Additional Source options - CSV, JSON , XML
+
+
+

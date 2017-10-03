@@ -15,108 +15,97 @@ import org.json.*;
 public class JobDescription {
 	private Document jobDesc;
 	Logger logger;
-	JobDescription(String configFile) throws FileNotFoundException
-	{
+
+	JobDescription(String configFile) throws FileNotFoundException {
 		logger = LoggerFactory.getLogger(JobDescription.class);
-	    String config = "";
+		String config = "";
 		try {
-			config = new String(Files.readAllBytes(Paths.get(configFile)), StandardCharsets.UTF_8);
+			config = new String(Files.readAllBytes(Paths.get(configFile)),
+					StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
-			
-		
-			
+
 			System.exit(1);
 		}
-		//Better errors from this parser
-		try{
+		// Better errors from this parser
+		try {
+			@SuppressWarnings("unused")
 			JSONObject obj = new JSONObject(config);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 			System.exit(1);
 		}
-	    jobDesc = Document.parse(config);
-	    
+		jobDesc = Document.parse(config);
+
 	}
 
 	public Map<String, Object> getJobDesc() {
 		return jobDesc;
 	}
-	
-	public String getDatabaseConnection()
-	{
-		return jobDesc.getString("databaseConnection");
+
+	public String getSourceConnection() {
+		return jobDesc.getString("sourceConnection");
 	}
-	
-	public String getMode()
-	{
-		String rval = "insert";
-		if(jobDesc.containsKey("mode"))
-		{
-		rval =  jobDesc.getString("mode");
+
+	public String getMode() {
+		String rval = null;
+		if (jobDesc.containsKey("outputMode")) {
+			rval = jobDesc.getString("outputMode");
 		}
 		return rval;
 	}
-	
-	public String getDatabaseUser()
-	{
-		return jobDesc.getString("databaseUser");
-	}
-	
-	public String getDatabasePass()
-	{
-		return jobDesc.getString("databasePassword");
-	}
-	
-	public String getMongoURI()
-	{
-		return jobDesc.getString("mongoConnection");
+
+	public String getSourceUser() {
+		return jobDesc.getString("sourceUser");
 	}
 
-	public String getMongoDatabase()
-	{
-		return jobDesc.getString("mongoDatabase");
-		
+	public String getSourcePassword() {
+		return jobDesc.getString("sourcePassword");
 	}
-	
-	public Document getMongoDefault()
-	{
-		return (Document)jobDesc.get("mongoDefault");
-		
+
+	public String getDestinationMongoURI() {
+		return jobDesc.getString("mongoDestConnection");
 	}
-	
-	
-	public String getMongoCollection()
+
+	public String getDestinationMongoDatabase()
+
 	{
-		return jobDesc.getString("mongoCollection");
+		return jobDesc.getString("mongoDestDatabase");
+
 	}
-	
-	public Document getMongoQuery()
-	{
-		return (Document)jobDesc.get("mongoQuery");
+
+	public Document getDestinationMongoDefault() {
+		return (Document) jobDesc.get("mongoDefault");
+
 	}
-	
-	public Document getMongoFields()
-	{
-		return (Document)jobDesc.get("mongoFields");
+
+	public String getDestinationMongoCollection() {
+		return jobDesc.getString("mongoDestCollection");
 	}
-	
-	public Document getMongoOrderBy()
-	{
-		return (Document)jobDesc.get("mongoOrderBy");
+
+//TODO get rid of this special case
+	public Document getDestiantionMongoQuery() {
+		return (Document) jobDesc.get("mongoQuery");
 	}
-	
-	
-	public Document getSection(String heading)
-	{
+
+	public Document getDestinationMongoFields() {
+		return (Document) jobDesc.get("mongoFields");
+	}
+
+	public Document getDestinationMongoOrderBy() {
+		return (Document) jobDesc.get("mongoOrderBy");
+	}
+
+	public Document getSection(String heading) {
 		if (heading == null) {
-			if(jobDesc.getString("startAt")==null) {
+			if (jobDesc.getString("startAt") == null) {
 				logger.error("No startAt defined");
-				System.exit(1);;
+				System.exit(1);
+				;
 			}
 			return jobDesc.get(jobDesc.getString("startAt"), Document.class);
 		}
 		return jobDesc.get(heading, Document.class);
 	}
-	
+
 }

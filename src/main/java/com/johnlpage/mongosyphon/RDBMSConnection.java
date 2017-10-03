@@ -9,7 +9,10 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RDBMSConnection {
+
+
+
+public class RDBMSConnection implements IDataSource {
 	private String connectionString = null;
 	private String user;
 	private String pass;
@@ -25,6 +28,9 @@ public class RDBMSConnection {
 	String stmttext=null;
 	Document prevRow=null;
 	
+	/* (non-Javadoc)
+	 * @see com.johnlpage.mongosyphon.IDataSource#close()
+	 */
 	public void close() {
 		try {
 			if (results != null)
@@ -47,10 +53,16 @@ public class RDBMSConnection {
 		}
 }
 
+	/* (non-Javadoc)
+	 * @see com.johnlpage.mongosyphon.IDataSource#hasResults()
+	 */
 	public boolean hasResults() {
 		return (results != null);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.johnlpage.mongosyphon.IDataSource#Connect(java.lang.String, java.lang.String)
+	 */
 	public void Connect(String user, String pass) {
 		try {
 			connection = DriverManager.getConnection(connectionString, user,
@@ -58,12 +70,16 @@ public class RDBMSConnection {
 		} catch (SQLException e) {
 			logger.error("Unable to connect to RDBMS");
 			logger.error(e.getMessage());
+			e.printStackTrace();
 			System.exit(1);
 		}
 		this.user = user;
 		this.pass = pass;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.johnlpage.mongosyphon.IDataSource#RunQuery(java.lang.String, java.util.ArrayList, org.bson.Document)
+	 */
 	public void RunQuery(String sql, ArrayList<String> params,
 			Document parent) {
 		try {
@@ -130,11 +146,17 @@ public class RDBMSConnection {
 	}
 
 	
+	/* (non-Javadoc)
+	 * @see com.johnlpage.mongosyphon.IDataSource#PushBackRow(org.bson.Document)
+	 */
 	public void PushBackRow(Document row)
 	{
 		prevRow = row;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.johnlpage.mongosyphon.IDataSource#GetNextRow()
+	 */
 	public Document GetNextRow() throws SQLException {
 		
 		//Handle a rewind
@@ -165,16 +187,30 @@ public class RDBMSConnection {
 		return row;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.johnlpage.mongosyphon.IDataSource#getConnectionString()
+	 */
 	public String getConnectionString() {
 		return connectionString;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.johnlpage.mongosyphon.IDataSource#getUser()
+	 */
 	public String getUser() {
 		return user;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.johnlpage.mongosyphon.IDataSource#getPass()
+	 */
 	public String getPass() {
 		return pass;
+	}
+
+	public String getType() {
+		// TODO Auto-generated method stub
+		return "SQL";
 	}
 
 }
