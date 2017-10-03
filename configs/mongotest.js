@@ -9,7 +9,7 @@
         target : {
           mode: "JSON",
           uri: "mongodb://MacPro.local:27017/",
-          name: "test.mongoout"
+          namespace: "test.mongoout"
         },
         template: {
             "id": "$_id",
@@ -20,8 +20,7 @@
         query: { 
             database: "test",
             collection: "people" ,
-            find: {} ,
-            limit: 1
+            find: {}
         }
     },
     
@@ -31,7 +30,7 @@
         template: {
             _value: "$name"
         },
-        mongoquery: { 
+        query: { 
             database: "test",
             collection: "colours" ,
             find: { _id : "$1"} 

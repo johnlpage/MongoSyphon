@@ -32,14 +32,15 @@ public class MongoBulkWriter {
 	List<WriteModel<Document>> ops;
 	int nops =0;
 	
-	public MongoBulkWriter(JobDescription target)
+	public MongoBulkWriter(String URI, String namespace)
 	{
 		logger = LoggerFactory.getLogger(MongoSyphon.class);
-		this.target = target;
-		logger.info("Connecting to " + target.getDestinationMongoURI() );
-		mongoClient = new MongoClient(new MongoClientURI(target.getDestinationMongoURI()));
-		db = mongoClient.getDatabase(target.getDestinationMongoDatabase());
-		collection = db.getCollection(target.getDestinationMongoCollection());
+
+		logger.info("Connecting to " + URI );
+		mongoClient = new MongoClient(new MongoClientURI(URI));
+		String[] parts = namespace.split("\\.");
+		db = mongoClient.getDatabase(parts[0]);
+		collection = db.getCollection(parts[1]);
 		
 		ops = new ArrayList<WriteModel<Document>>();
 	}

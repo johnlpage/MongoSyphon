@@ -1,17 +1,36 @@
 {
-"databaseConnection": "jdbc:mysql://localhost:3306/jmdb?useUnicode=true&useServerPrepStmts=true&useSSL=false",
-"databaseUser": "root",
-"databasePassword": "password",
-"mongoConnection": "mongodb://MacPro.local:27017/",
-"mongoDatabase": "imdb",
-"mongoCollection": "movies",
-"mongoQuery" : {},
-"mongoFields" : { "_id" : 1},
-"mongoOrderBy" : { "_id" : -1},
-"mongoDefault" : { "_id" : 0 },
-"startAt": "moviessection",
 
-"moviessection": {
+
+start : {
+    source: {
+        uri: "mongodb://MacPro.local:27017/"
+    },
+    query: { 
+        database: "imdb",
+        collection: "movies" ,
+        find: {} ,
+        limit: 1,
+        project: { _id: 1},
+        sort: { _id : -1},
+        default : { _id: 0 }
+    },
+    target : {
+        mode: "subsection",
+        uri: "moviesection",
+      }
+},
+
+"moviesection": {
+    source: {
+        uri:  "jdbc:mysql://localhost:3306/jmdb?useUnicode=true&useServerPrepStmts=true&useSSL=false",
+        user: "root",
+        password: "password",
+    },
+    target : {
+      mode: "json",
+      uri: "mongodb://MacPro.local:27017/",
+      namespace: "imdb.movies"
+    },
     "template": {
       "_id": "$movieid",
       "title": "$title",
@@ -44,7 +63,7 @@
       "technical":["@technicalsection"],
       "trivia":["@triviasection"]
     },
-    "sql": "SELECT * FROM movies where movieid > ? order by movieid",
+    "query": {sql:"SELECT * FROM movies where movieid > ? order by movieid"},
     "params" : [ "_id" ]
   },
 
@@ -54,7 +73,7 @@
       "title": "$title",
       "addition": "$addition"
     },
-    "sql": "SELECT * FROM akatitles where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM akatitles where movieid>? order by movieid"},
     "mergeon":"movieid",
     "params": ["movieid"]
   },
@@ -63,7 +82,7 @@
     "template": {
       "_value": "$versiontext"
     },
-    "sql": "SELECT * FROM altversions where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM altversions where movieid>? order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -72,7 +91,7 @@
     "template": {
       "_value": "$businesstext"
     },
-    "sql": "SELECT * FROM business  where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM business  where movieid>? order by movieid"},
     "mergeon":"movieid",
     "params": ["movieid"]
   },
@@ -83,7 +102,7 @@
       "certification": "$certification",
       "addition": "$addition"
     },
-    "sql": "SELECT * FROM certificates  where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM certificates  where movieid>? order by movieid"},
     "mergeon":"movieid",
     "params": ["movieid"]
   },
@@ -93,7 +112,7 @@
       "color": "$color",
       "addition": "$addition"
     },
-    "sql": "SELECT * FROM colorinfo  where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM colorinfo  where movieid>? order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -102,7 +121,7 @@
       "template": {
         "_value": "$country"
       },
-      "sql": "SELECT * FROM countries  where movieid>?  order by movieid",
+      "query": {sql:"SELECT * FROM countries  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
     },
@@ -111,7 +130,7 @@
     
       "credittext": "$credittext"
     },
-    "sql": "SELECT * FROM crazycredits  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM crazycredits  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -121,7 +140,7 @@
         "name": "$name",
         "addition": "$addition"
       },
-      "sql": "SELECT * FROM distributors  where movieid>?   order by movieid",
+      "query": {sql:"SELECT * FROM distributors  where movieid>?   order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
     },
@@ -129,7 +148,7 @@
     "template": {
       "_value": "$genre"
     },
-    "sql": "SELECT * FROM genres  where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM genres  where movieid>? order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -137,7 +156,7 @@
     "template": {
       "_value": "$gooftext"
     },
-    "sql": "SELECT * FROM goofs  where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM goofs  where movieid>? order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -145,7 +164,7 @@
     "template": {
       "_value": "$keyword"
     },
-    "sql": "SELECT * FROM keywords  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM keywords  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -154,7 +173,7 @@
       "language": "$language",
       "addition": "$addition"
     },
-    "sql": "SELECT * FROM language  where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM language  where movieid>? order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -162,7 +181,7 @@
     "template": {
       "_value": "$literaturetext"
     },
-    "sql": "SELECT * FROM literature  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM literature  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -172,7 +191,7 @@
       "location": "$location",
       "addition": "$addition"
     },
-    "sql": "SELECT * FROM locations  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM locations  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
     
@@ -181,7 +200,7 @@
     "template": {
       "_value": "$movielinkstext"
     },
-    "sql": "SELECT * FROM movielinks  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM movielinks  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -190,7 +209,7 @@
     "template": {
       "_value": "$reasontext"
     },
-    "sql": "SELECT * FROM mpaaratings  where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM mpaaratings  where movieid>? order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -198,7 +217,7 @@
     "template": {
       "_value": "$plottext"
     },
-    "sql": "SELECT * FROM plots  where movieid>?   order by movieid",
+    "query": {sql:"SELECT * FROM plots  where movieid>?   order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -207,7 +226,7 @@
       "name": "$name",
       "addition": "$addition"
     },
-    "sql": "SELECT * FROM prodcompanies   where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM prodcompanies   where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -215,7 +234,7 @@
     "template": {
       "_value": "$quotetext"
     },
-    "sql": "SELECT * FROM quotes  where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM quotes  where movieid>? order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -225,7 +244,7 @@
       "votes": "$votes",
       "distribution": "$distribution"
     },
-    "sql": "SELECT * FROM ratings  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM ratings  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -236,7 +255,7 @@
       "releasedate": "$releasedate",
       "addition": "$addition"
     },
-    "sql": "SELECT * FROM releasedates  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM releasedates  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -245,7 +264,7 @@
       "time": "$time",
       "addition": "$addition"
     },
-    "sql": "SELECT * FROM runningtimes  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM runningtimes  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -254,7 +273,7 @@
       "sound": "$sound",
       "addition": "$addition"
     },
-    "sql": "SELECT * FROM soundmix  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM soundmix  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -262,7 +281,7 @@
     "template": {
       "_value": "$soundtracktext"
     },
-    "sql": "SELECT * FROM soundtracks  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM soundtracks  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -270,7 +289,7 @@
     "template": {
       "_value": "$taglinetext"
     },
-    "sql": "SELECT * FROM taglines  where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM taglines  where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -280,7 +299,7 @@
       "name": "$name",
       "addition": "$addition"
     },
-    "sql": "SELECT * FROM technical where movieid>?  order by movieid",
+    "query": {sql:"SELECT * FROM technical where movieid>?  order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   },
@@ -289,7 +308,7 @@
 
       "_value": "$triviatext"
     },
-    "sql": "SELECT * FROM trivia   where movieid>? order by movieid",
+    "query": {sql:"SELECT * FROM trivia   where movieid>? order by movieid"},
      "mergeon":"movieid",
      "params": ["movieid"]
   }
