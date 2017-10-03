@@ -1,15 +1,6 @@
 {
-sourceConnection: "jdbc:mysql://localhost:3306/employees?useUnicode=true&useServerPrepStmts=true&useSSL=false",
-sourceUser: "root",
-sourcePassword: "password",
-mongoConnection: "mongodb://MacPro.local:27017/",
-mongoDatabase: "test",
-mongoCollection: "employees",
 
-startAt: "employeessection",
-
-
-employeessection: {
+start: {
   template: {
       "_id": "$emp_no",
       "birth_date": "$birth_date",
@@ -21,7 +12,17 @@ employeessection: {
       "salaries": [ "@salariessection"],
       "depts": [ "@dept_empsection"],
     },
-  sql: 'SELECT * FROM employees order by emp_no'
+    source: {
+        uri:  "jdbc:mysql://localhost:3306/employees?useUnicode=true&useServerPrepStmts=true&useSSL=false",
+        user: "root",
+        password: "password",
+    },
+    target : {
+      mode: "insert",
+      uri: "mongodb://MacPro.local:27017/",
+      namespace: "test2.employees"
+    },
+  query: 'SELECT * FROM employees order by emp_no'
 },
 
 
@@ -31,7 +32,7 @@ titlessection: {
       "from_date": "$from_date",
       "to_date": "$to_date"
     },
-  sql: 'SELECT * FROM titles order by emp_no',
+    query: 'SELECT * FROM titles order by emp_no',
   mergeon: "emp_no"
   },
 
@@ -43,7 +44,7 @@ salariessection:{
       "from_date": "$from_date",
       "to_date": "$to_date"
     },
-  sql: 'SELECT * FROM salaries order by emp_no',
+    query: 'SELECT * FROM salaries order by emp_no',
  mergeon: "emp_no" 
 },
 
@@ -54,7 +55,7 @@ dept_empsection:{
       "from_date": "$from_date",
       "to_date": "$to_date"
     },
-  sql: 'SELECT * FROM dept_emp order by emp_no',
+    query: 'SELECT * FROM dept_emp order by emp_no',
    mergeon: "emp_no" 
 },
 
@@ -62,7 +63,7 @@ departmentssection: {
  template: {
       "_value": "$dept_name"
     },
-  sql: 'SELECT * FROM departments where dept_no=? ',
+    query: 'SELECT * FROM departments where dept_no=? ',
   params: [ "dept_no" ],
   cached: true
 },
@@ -76,7 +77,7 @@ current_dept_empsection: {
       "from_date": "$from_date",
       "to_date": "$to_date"
     },
-  sql: 'SELECT * FROM current_dept_emp ',
+    query: 'SELECT * FROM current_dept_emp ',
 },
 
 dept_emp_latest_datesection: { 
@@ -85,7 +86,7 @@ dept_emp_latest_datesection: {
       "from_date": "$from_date",
       "to_date": "$to_date"
     },
-  sql: 'SELECT * FROM dept_emp_latest_date ',
+    query: 'SELECT * FROM dept_emp_latest_date ',
 },
 
 dept_managersection:{
@@ -95,6 +96,6 @@ dept_managersection:{
       "from_date": "$from_date",
       "to_date": "$to_date"
     },
-  sql: 'SELECT * FROM dept_manager '
+    query: 'SELECT * FROM dept_manager '
 }
 }

@@ -43,67 +43,9 @@ public class JobDescription {
 		return jobDesc;
 	}
 
-	public String getSourceConnection() {
-		return jobDesc.getString("sourceConnection");
-	}
-
-	public String getMode() {
-		String rval = null;
-		if (jobDesc.containsKey("outputMode")) {
-			rval = jobDesc.getString("outputMode");
-		}
-		return rval;
-	}
-
-	public String getSourceUser() {
-		return jobDesc.getString("sourceUser");
-	}
-
-	public String getSourcePassword() {
-		return jobDesc.getString("sourcePassword");
-	}
-
-	public String getDestinationMongoURI() {
-		return jobDesc.getString("mongoDestConnection");
-	}
-
-	public String getDestinationMongoDatabase()
-
-	{
-		return jobDesc.getString("mongoDestDatabase");
-
-	}
-
-	public Document getDestinationMongoDefault() {
-		return (Document) jobDesc.get("mongoDefault");
-
-	}
-
-	public String getDestinationMongoCollection() {
-		return jobDesc.getString("mongoDestCollection");
-	}
-
-//TODO get rid of this special case
-	public Document getDestiantionMongoQuery() {
-		return (Document) jobDesc.get("mongoQuery");
-	}
-
-	public Document getDestinationMongoFields() {
-		return (Document) jobDesc.get("mongoFields");
-	}
-
-	public Document getDestinationMongoOrderBy() {
-		return (Document) jobDesc.get("mongoOrderBy");
-	}
-
 	public Document getSection(String heading) {
 		if (heading == null) {
-			if (jobDesc.getString("startAt") == null) {
-				logger.error("No startAt defined");
-				System.exit(1);
-				;
-			}
-			return jobDesc.get(jobDesc.getString("startAt"), Document.class);
+			return jobDesc.get("start", Document.class);
 		}
 		return jobDesc.get(heading, Document.class);
 	}

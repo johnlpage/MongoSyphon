@@ -30,7 +30,8 @@ public class MongoConnection implements IDataSource {
 	Document cachedRow = null;
 	String stmttext = null;
 	Document prevRow = null;
-
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -292,11 +293,12 @@ public class MongoConnection implements IDataSource {
 			return null;
 		}
 		if (results.hasNext() == false) {
+			
 			return null;
 		}
 
 		Document row = results.next();
-
+		
 		if (cache != null && stmttext != null) {
 			cache.put(stmttext, row);
 		}

@@ -1,16 +1,7 @@
 {
-sourceUser: "",
-sourcePassword: "",
-sourceConnection: "mongodb://MacPro.local:27017",
 
-mongoDestConnection: "mongodb://MacPro.local:27017/",
-mongoDestDatabase: "test",
-mongoDestCollection: "employees",
-
-startAt: "employeessection",
-
-
-employeessection: {
+    
+start: {
   template: {
       "_id": "$emp_no",
       "birth_date": "$birth_date",
@@ -22,7 +13,15 @@ employeessection: {
       "salaries": [ "@salariessection"],
       "depts": [ "@dept_empsection"],
     },
-    mongoquery: { 
+    source: {
+        uri: "mongodb://MacPro.local:27017",
+    },
+    target : {
+      mode: "insert",
+      uri: "mongodb://MacPro.local:27017/",
+      namespace: "test.employees"
+    },
+    query: { 
         database: "employees",
         collection: "employees" ,
         find: {} ,
@@ -38,7 +37,7 @@ titlessection: {
       "from_date": "$from_date",
       "to_date": "$to_date"
     },
-    mongoquery: { 
+    query: { 
         database: "employees",
         collection: "titles" ,
         find: {} ,
@@ -55,7 +54,7 @@ salariessection:{
       "from_date": "$from_date",
       "to_date": "$to_date"
     },
-    mongoquery: { 
+    query: { 
         database: "employees",
         collection: "salaries",
         find: {} ,
@@ -71,7 +70,7 @@ dept_empsection:{
       "from_date": "$from_date",
       "to_date": "$to_date"
     },
-    mongoquery: { 
+    query: { 
         database: "employees",
         collection: "dept_emp" ,
         find: {} ,
@@ -84,7 +83,7 @@ departmentssection: {
  template: {
       "_value": "$dept_name"
     },
-    mongoquery: { 
+    query: { 
         database: "employees",
         collection: "departments" ,
         find: { dept_no : "$1 "} 

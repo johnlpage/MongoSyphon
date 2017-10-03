@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bson.Document;
+import org.json.JSONObject;
+import org.json.XML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,15 +13,21 @@ public class DocumentGenerator {
 	private IDataSource connection = null;
 	private JobDescription jobdesc;
 	Logger logger;
+	String sectionName;
 	Document section = null;
 	Document template = null;
 	Document params = null;
-	//This is a cache of sub genetators
+	String targetMode = null;
+	MongoBulkWriter mongoTarget = null;
+	Boolean hasRows = false;
+	
+	//This is a cache of sub document generators
 	HashMap<String, DocumentGenerator> docGens = new HashMap<String, DocumentGenerator>();
 
-	DocumentGenerator(JobDescription jobdesc, String section, Document params) {
+	DocumentGenerator(JobDescription jobdesc, String section, Document params,Document parentSource) {
 		logger = LoggerFactory.getLogger(DocumentGenerator.class);
 		this.jobdesc = jobdesc;
+		this.sectionName  = section;
 		this.section = jobdesc.getSection(section);
 		if (this.section == null) {
 			logger.error("Cannot find section named '" + section
@@ -27,8 +35,80 @@ public class DocumentGenerator {
 			System.exit(1);
 			;
 		}
-		this.template = (Document) this.section.get("template");
+		this.template = (Document) this.section.get("template",Document.class);
 		this.params = params;
+		
+		//Does this section define a source, if so we should connect to it
+		if(this.section.get("source") == null) {
+			if(parentSource == null) {
+				logger.error("Cannot find a source defined in section " + section + "or any parent");
+				System.exit(1);
+			}
+			this.section.put("source", parentSource);
+		}
+		connectToSource(this.section.get("source",Document.class));
+		connectToTarget(this.section.get("target",Document.class));
+	}
+	
+	//It's fine to not have a target, most sections won't have one
+	
+	private void connectToTarget(Document target)
+	{
+		if(target == null) { return; }
+		targetMode = target.getString("mode");
+		if(targetMode == null) {
+			logger.error("no target mode defined in "+sectionName);
+			System.exit(1);
+		}
+		if( targetMode.equalsIgnoreCase("json") || targetMode.equalsIgnoreCase("xml") )
+		{
+			return;
+		}
+		if( targetMode.equalsIgnoreCase("insert")|| targetMode.equalsIgnoreCase("update")  
+				|| targetMode.equalsIgnoreCase("upsert")  )
+		{
+			String targetURI = target.getString("uri");
+			if(targetURI == null) {
+				logger.error("Target needs a URI in section "+sectionName);
+				System.exit(1);
+			}
+			String namespace = target.getString("namespace");
+			if(namespace == null) {
+				logger.error("No namespace defined in target section of "+sectionName);
+			}
+	
+			mongoTarget = new MongoBulkWriter(targetURI,namespace);
+		}
+	}
+	
+	private void connectToSource(Document source)
+	{
+		// Do I have a connection - if not get one
+		if (connection == null) {
+			
+			String connStr = source.getString("uri");
+			if(connStr==null) {
+				logger.error("No uri deinfed in source for "+sectionName);
+				System.exit(1);
+			}
+			
+			logger.info("connecting to " + connStr);
+			if (connStr.startsWith("mongodb:")) {
+				connection = new MongoConnection(connStr,
+						section.containsKey("cached"));
+				connection.Connect(null,null); //In the URI
+			} else if(connStr.startsWith("jdbc:")){
+				connection = new RDBMSConnection(connStr,
+						section.containsKey("cached"));
+
+				connection.Connect(source.getString("user"),
+						source.getString("password"));
+
+			} else {
+				logger.error("Don't know how to handle connection uri " + connStr);
+				System.exit(1);
+			}
+		}
 	}
 
 	public void setParams(Document params) {
@@ -41,32 +121,82 @@ public class DocumentGenerator {
 		}
 	}
 
+	public void runConversion()
+	{
+		
+		long lasttime = System.currentTimeMillis();
+		
+		Document doc = getNext();
+		
+		int lastcount = 0;
+		int currcount = 0;
+		while (doc != null) {
+			if (targetMode.equalsIgnoreCase("subsection")) {
+				
+				String subsectionName = section.get("target",Document.class).getString("uri");
+				
+				DocumentGenerator subgen;
+					if (docGens.containsKey(subsectionName)) {
+						subgen = docGens.get(subsectionName);
+						subgen.setParams(doc);
+					} else {
+
+						subgen = new DocumentGenerator(jobdesc, subsectionName,
+								doc,section.get("source",Document.class));
+						docGens.put(subsectionName, subgen);
+					}
+					subgen.runConversion();
+			} else
+			if (targetMode.equalsIgnoreCase("JSON")) {
+				//TODO: This can be way nicer JSON
+				System.out.println(doc.toJson());
+			} else if (targetMode.equalsIgnoreCase("XML")) {
+				//TODO: Add seom XML conversion options
+				//As this is poor
+				String xml = XML.toString(new JSONObject(doc));
+				System.out.println(xml);
+			} else {
+				if (targetMode.equalsIgnoreCase("insert")) {
+					mongoTarget.Create(doc);
+				} else if (targetMode.equalsIgnoreCase("update")) {
+					mongoTarget.Update(doc, false);
+				} else if (targetMode.equalsIgnoreCase("upsert")) {
+					mongoTarget.Update(doc, true);
+				} else {
+					logger.error("Unknown mode " + targetMode);
+					logger.error("Should be one of insert,update,upsert,JSON,XML");
+					System.exit(1);
+				}
+			}
+			
+			currcount++;
+			if (currcount - lastcount == 1000) {
+				// Change to logging maybe
+				long mstime = System.currentTimeMillis() - lasttime;
+				if (targetMode.equalsIgnoreCase("subsection")==false){
+				System.out.printf(
+						"%d records converted in %d seconds at an average of %d records/s\n",
+						currcount, mstime / 1000L,
+						(1000L * currcount) / mstime);
+				}
+				lastcount = currcount;
+			}
+			doc = getNext();
+		}
+		long mstime = System.currentTimeMillis() - lasttime;
+		if (targetMode.equalsIgnoreCase("subsection")==false){
+		System.out.printf(
+				"%d records converted in %d seconds at an average of %d records/s\n",
+				currcount, mstime / 1000L, (1000L * currcount) / (mstime + 1));
+		}
+		if(mongoTarget != null) {
+			mongoTarget.close();
+		}
+	}
 	// Return the next document of NULL if we have no more
 	public Document getNext() {
 		Document rval = null;
-
 		Document row = new Document();
-
-		// Do I have a connection - if not get one
-		if (connection == null) {
-
-			String connStr = jobdesc.getSourceConnection();
-			logger.info(connStr);
-			if (connStr.startsWith("mongodb:")) {
-				connection = new MongoConnection(jobdesc.getSourceConnection(),
-						section.containsKey("cached"));
-				connection.Connect(jobdesc.getSourceUser(),
-						jobdesc.getSourcePassword());
-			} else {
-				connection = new RDBMSConnection(jobdesc.getSourceConnection(),
-						section.containsKey("cached"));
-
-				connection.Connect(jobdesc.getSourceUser(),
-						jobdesc.getSourcePassword());
-
-			}
-
-		}
 
 		@SuppressWarnings("unchecked")
 		ArrayList<String> paramArray = section.get("params", ArrayList.class);
@@ -75,23 +205,35 @@ public class DocumentGenerator {
 
 			if (connection.getType() == "SQL") {
 
-				connection.RunQuery(section.getString("sql"), paramArray,
+				connection.RunQuery(section.get("query",Document.class).getString("sql"), paramArray,
 						params);
 			} else if (connection.getType() == "MONGO") {
 
-				Object q = section.get("mongoquery");
+				Object q = section.get("query");
 				if (q instanceof Document) {
 					connection.RunQuery(
-							((Document) section.get("mongoquery")).toJson(),
+							((Document) section.get("query")).toJson(),
 							paramArray, params);
 				} else {
-					logger.error("mongoQuery must be specified as an object");
+					logger.error("query must be specified as an object for mongodb");
 				}
 			}
 		}
 
 		try {
 			row = connection.GetNextRow();
+			
+			//If it's null, and we havent fetched ANY rows,
+			// and we have a default defined return that
+			if(row == null ) {
+				if(hasRows==false) {
+					//null if no default
+					row  = section.get("query",Document.class).get("default",Document.class);
+					hasRows=true; //Only once
+				}
+			} else {
+				hasRows=true;
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			System.exit(1);
@@ -147,8 +289,14 @@ public class DocumentGenerator {
 		// End Merge
 
 		// Apply template to database ROW
-		if (row != null) {
+		if (row != null)
+			{
+			if(template != null) {
+			
 			rval = TemplateRow(template, row);
+			} else {
+				rval = row;
+			}
 		}
 		return rval;
 	}
@@ -177,7 +325,7 @@ public class DocumentGenerator {
 					} else {
 
 						subgen = new DocumentGenerator(jobdesc, v.substring(1),
-								row);
+								row,section.get("source",Document.class));
 						docGens.put(v.substring(1), subgen);
 					}
 					Document subdoc = subgen.getNext();
@@ -210,7 +358,7 @@ public class DocumentGenerator {
 					subgen.setParams(row);
 				} else {
 					subgen = new DocumentGenerator(jobdesc, v.substring(1),
-							row);
+							row,section.get("source",Document.class));
 					docGens.put(v.substring(1), subgen);
 				}
 
