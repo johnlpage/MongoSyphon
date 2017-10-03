@@ -1,0 +1,31 @@
+2017-10-02 15:23:02.037 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:25 - MongoSyphon Version 0.1.1
+2017-10-02 15:23:02.041 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-10-02 15:23:02.092 [main] ERROR c.johnlpage.mongosyphon.MongoSyphon:64 - outputMode must be one of insert,update,upsert,JSON,XML
+2017-10-02 15:23:18.212 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:25 - MongoSyphon Version 0.1.1
+2017-10-02 15:23:18.217 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-10-02 15:23:18.276 [main] INFO  c.j.mongosyphon.DocumentGenerator:54 - mongodb://MacPro.local:27017
+2017-10-02 15:23:18.277 [main] INFO  c.j.mongosyphon.MongoConnection:77 - Connecting to mongodb://MacPro.local:27017
+2017-10-02 15:23:18.604 [main] INFO  c.j.mongosyphon.MongoConnection:240 - executing Document{{}}
+2017-10-02 15:23:18.618 [main] INFO  c.j.mongosyphon.DocumentGenerator:54 - mongodb://MacPro.local:27017
+2017-10-02 15:23:18.618 [main] INFO  c.j.mongosyphon.MongoConnection:77 - Connecting to mongodb://MacPro.local:27017
+2017-10-02 15:23:18.626 [main] INFO  c.j.mongosyphon.MongoConnection:240 - executing Document{{_id=2.0}}
+2017-10-02 15:23:18.630 [main] INFO  c.j.mongosyphon.MongoConnection:240 - executing Document{{_id=1.0}}
+2017-10-02 15:23:18.632 [main] INFO  c.j.mongosyphon.MongoConnection:240 - executing Document{{_id=3.0}}
+2017-10-02 15:23:52.200 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:25 - MongoSyphon Version 0.1.1
+2017-10-02 15:23:52.205 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-10-02 15:23:52.258 [main] INFO  c.j.mongosyphon.DocumentGenerator:54 - mongodb://MacPro.local:27017
+2017-10-02 15:23:52.259 [main] INFO  c.j.mongosyphon.MongoConnection:77 - Connecting to mongodb://MacPro.local:27017
+2017-10-02 15:23:52.580 [main] INFO  c.j.mongosyphon.MongoConnection:240 - executing Document{{}}
+2017-10-02 15:23:52.593 [main] INFO  c.j.mongosyphon.DocumentGenerator:54 - mongodb://MacPro.local:27017
+2017-10-02 15:23:52.593 [main] INFO  c.j.mongosyphon.MongoConnection:77 - Connecting to mongodb://MacPro.local:27017
+2017-10-02 15:23:52.601 [main] INFO  c.j.mongosyphon.MongoConnection:240 - executing Document{{_id=2.0}}
+2017-10-02 15:23:52.603 [main] INFO  c.j.mongosyphon.MongoConnection:240 - executing Document{{_id=1.0}}
+2017-10-02 15:23:52.606 [main] INFO  c.j.mongosyphon.MongoConnection:240 - executing Document{{_id=3.0}}
+2017-10-02 15:24:34.776 [main] INFO  c.johnlpage.mongosyphon.MongoSyphon:25 - MongoSyphon Version 0.1.1
+2017-10-02 15:24:34.781 [main] INFO  c.j.mongosyphon.CommandLineOptions:23 - Parsing Command Line
+2017-10-02 15:24:34.841 [main] INFO  c.j.mongosyphon.DocumentGenerator:54 - mongodb://MacPro.local:27017
+2017-10-02 15:24:34.842 [main] INFO  c.j.mongosyphon.MongoConnection:77 - Connecting to mongodb://MacPro.local:27017
+2017-10-02 15:24:35.158 [main] INFO  c.j.mongosyphon.MongoConnection:240 - executing Document{{}}
+2017-10-02 15:24:35.171 [main] INFO  c.j.mongosyphon.DocumentGenerator:54 - mongodb://MacPro.local:27017
+2017-10-02 15:24:35.171 [main] INFO  c.j.mongosyphon.MongoConnection:77 - Connecting to mongodb://MacPro.local:27017
+2017-10-02 15:24:35.181 [main] INFO  c.j.mongosyphon.MongoConnection:240 - executing Document{{_id=2.0}}

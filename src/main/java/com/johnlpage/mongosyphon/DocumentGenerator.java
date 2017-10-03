@@ -1,24 +1,20 @@
 package com.johnlpage.mongosyphon;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mysql.jdbc.Statement;
-
 public class DocumentGenerator {
-	private RDBMSConnection connection = null;
+	private IDataSource connection = null;
 	private JobDescription jobdesc;
 	Logger logger;
 	Document section = null;
 	Document template = null;
 	Document params = null;
+	//This is a cache of sub genetators
 	HashMap<String, DocumentGenerator> docGens = new HashMap<String, DocumentGenerator>();
 
 	DocumentGenerator(JobDescription jobdesc, String section, Document params) {
@@ -53,22 +49,50 @@ public class DocumentGenerator {
 
 		// Do I have a connection - if not get one
 		if (connection == null) {
-			connection = new RDBMSConnection(jobdesc.getDatabaseConnection(),
-					section.containsKey("cached"));
-			connection.Connect(jobdesc.getDatabaseUser(),
-					jobdesc.getDatabasePass());
+
+			String connStr = jobdesc.getSourceConnection();
+			logger.info(connStr);
+			if (connStr.startsWith("mongodb:")) {
+				connection = new MongoConnection(jobdesc.getSourceConnection(),
+						section.containsKey("cached"));
+				connection.Connect(jobdesc.getSourceUser(),
+						jobdesc.getSourcePassword());
+			} else {
+				connection = new RDBMSConnection(jobdesc.getSourceConnection(),
+						section.containsKey("cached"));
+
+				connection.Connect(jobdesc.getSourceUser(),
+						jobdesc.getSourcePassword());
+
+			}
 
 		}
 
+		@SuppressWarnings("unchecked")
 		ArrayList<String> paramArray = section.get("params", ArrayList.class);
 
 		if (connection.hasResults() == false) {
-			connection.RunQuery(section.getString("sql"), paramArray, params);
+
+			if (connection.getType() == "SQL") {
+
+				connection.RunQuery(section.getString("sql"), paramArray,
+						params);
+			} else if (connection.getType() == "MONGO") {
+
+				Object q = section.get("mongoquery");
+				if (q instanceof Document) {
+					connection.RunQuery(
+							((Document) section.get("mongoquery")).toJson(),
+							paramArray, params);
+				} else {
+					logger.error("mongoQuery must be specified as an object");
+				}
+			}
 		}
 
 		try {
 			row = connection.GetNextRow();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 			System.exit(1);
 		}
@@ -79,7 +103,7 @@ public class DocumentGenerator {
 		// If it's the value we want we use it
 		// If it's > the value we want we push it back on the cursor, but
 		// tricky in RDBMSConnection
-		
+
 		while (section.containsKey("mergeon") && found == false) {
 			String mergeField = section.getString("mergeon");
 			// Row is the data below
@@ -102,7 +126,7 @@ public class DocumentGenerator {
 				if (compval < 0) {
 					try {
 						row = connection.GetNextRow();
-					} catch (SQLException e) {
+					} catch (Exception e) {
 						logger.error(e.getMessage());
 						System.exit(1);
 					}
@@ -129,6 +153,7 @@ public class DocumentGenerator {
 		return rval;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Document TemplateRow(Document template, Document row) {
 		DocumentGenerator subgen;
 
@@ -174,7 +199,7 @@ public class DocumentGenerator {
 					}
 					subgen.close();
 				} else {
-					rval.append(key, v); //Literal
+					rval.append(key, v); // Literal
 				}
 			} else if (val.getClass() == ArrayList.class) {
 				ArrayList<String> t = (ArrayList<String>) val;
@@ -189,7 +214,7 @@ public class DocumentGenerator {
 					docGens.put(v.substring(1), subgen);
 				}
 
-				ArrayList subdocs = new ArrayList();
+				ArrayList<Object> subdocs = new ArrayList<Object>();
 				Document example = subgen.getNext();
 				while (example != null) {
 					if (example.containsKey("_value")) {
@@ -210,12 +235,12 @@ public class DocumentGenerator {
 					rval.append(key, subdocs);
 				}
 			} else if (val.getClass() == Document.class) {
-				Document child = TemplateRow((Document)val,  row);
-				if(child.isEmpty()==false) {
+				Document child = TemplateRow((Document) val, row);
+				if (child.isEmpty() == false) {
 					rval.append(key, child);
 				}
 			}
-			
+
 		}
 		return rval;
 	}

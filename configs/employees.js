@@ -1,7 +1,7 @@
 {
-databaseConnection: "jdbc:mysql://localhost:3306/employees?useUnicode=true&useServerPrepStmts=true&useSSL=false",
-databaseUser: "root",
-databasePassword: "password",
+sourceConnection: "jdbc:mysql://localhost:3306/employees?useUnicode=true&useServerPrepStmts=true&useSSL=false",
+sourceUser: "root",
+sourcePassword: "password",
 mongoConnection: "mongodb://MacPro.local:27017/",
 mongoDatabase: "test",
 mongoCollection: "employees",

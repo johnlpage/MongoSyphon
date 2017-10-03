@@ -1,0 +1,14 @@
+create database test;
+use test
+create table people( id int  , name varchar(20), favcolour int, primary key (id));
+insert into people values(1,"john",2);
+insert into people values(2,"carol",1);
+insert into people values(3,"ian",2);
+insert into people values(4,"fiona",3);
+commit;
+
+create table colours( id int  , name varchar(20),  primary key (id) );
+insert into colours values(1,"red");
+insert into colours values(2,"green");
+insert into colours values(3,"blue");
+commit;

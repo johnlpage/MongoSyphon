@@ -37,8 +37,8 @@ public class ConfigGenerator {
 
 		try {
 			connection = DriverManager.getConnection(
-					jobdesc.getDatabaseConnection(), jobdesc.getDatabaseUser(),
-					jobdesc.getDatabasePass());
+					jobdesc.getSourceConnection(), jobdesc.getSourceUser(),
+					jobdesc.getSourcePassword());
 
 			DatabaseMetaData md = connection.getMetaData();
 			ResultSet rs = md.getTables(null, null, "%", null);
