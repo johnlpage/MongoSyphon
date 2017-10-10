@@ -28,8 +28,7 @@ start : {
     },
     target : {
       mode: "json",
-      uri: "mongodb://MacPro.local:27017/",
-      namespace: "imdb.movies"
+
     },
     "template": {
       "_id": "$movieid",
