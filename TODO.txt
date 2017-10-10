@@ -7,9 +7,9 @@ Read from Mongo as well as SQL - Aggregation or Query
   
 JSON and XML Output (Various XML formats)
 
-Change top level Mongo Query to a standard section
+Change top level Mongo Query to a standard section [X]
 
-connection per section
+connection per section option [X]
 
 
 Run as Web Service option
