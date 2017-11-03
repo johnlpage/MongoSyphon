@@ -287,14 +287,22 @@ public class DocumentGenerator {
 		// tricky in RDBMSConnection
 
 		while (section.containsKey("mergeon") && found == false) {
-			String mergeField = section.getString("mergeon");
+			String mergeFields = section.getString("mergeon");
+			String bits[] = mergeFields.split("\\=");
+			String mergeFrom ;
+			String mergeTo = bits[0];
+			if(bits.length > 0) {
+				 mergeFrom = bits[1];
+			} else {
+				 mergeFrom = bits[0];
+			}
 			// Row is the data below
 			// Params is the row above
-			if (params.containsKey(mergeField) && row != null
-					&& row.containsKey(mergeField)) {
+			if (params.containsKey(mergeFrom) && row != null
+					&& row.containsKey(mergeTo)) {
 				int compval = -1;
-				Object parent = params.get(mergeField);
-				Object child = row.get(mergeField);
+				Object parent = params.get(mergeFrom);
+				Object child = row.get(mergeTo);
 				if (parent.getClass() == child.getClass()) {
 					if (parent.getClass() == String.class) {
 						String a = (String) parent;
