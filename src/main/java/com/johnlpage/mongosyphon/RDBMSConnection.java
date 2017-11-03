@@ -57,6 +57,7 @@ public class RDBMSConnection implements IDataSource {
 	 * @see com.johnlpage.mongosyphon.IDataSource#hasResults()
 	 */
 	public boolean hasResults() {
+		
 		return (results != null);
 	}
 
