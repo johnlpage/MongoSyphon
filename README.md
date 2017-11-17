@@ -108,7 +108,7 @@ Now we have a three table schema each _owner_ has 0 or more pets, each _pet_ has
 			mode: "insert",
 			uri: "mongodb://localhost:27017/",
 			namespace: "sdemo.owners"
-		}
+		},
 		template: {
 			_id: "$ownerid",
 			name: "$name",
@@ -120,27 +120,27 @@ Now we have a three table schema each _owner_ has 0 or more pets, each _pet_ has
 		}
 	},
 
-
 	petsection: {
 		template: {
 			petid: "$petid",
 			name: "$name",
 			species : "@speciessection"
 		},
-		sql: 'SELECT * FROM pet where owner = ?',
+		query:{
+			sql: 'SELECT * FROM pet where owner = ?'
+		},
 		params: [ "ownerid" ]
-
 	},
 
 	speciessection: {
 		template: {
 			_value : "$species"
 		},
-		sql: 'SELECT * from species where speciesid = ?',
+		query: {
+			sql: 'SELECT * from species where speciesid = ?'
+		},
 		params : [ "species" ]
-
 	}
-
 }
 >java -jar ../bin/MongoSyphon.jar -c owners.js 
 2 records converted in 0 seconds at an average of 7 records/s
