@@ -21,29 +21,25 @@
 		}
 	},
 
-
 	petsection: {
 		template: {
 			petid: "$petid",
 			name: "$name",
 			species : "@speciessection"
 		},
-                query:{
-		sql: 'SELECT * FROM pet where owner = ?'
-                },
+		query:{
+		    sql: 'SELECT * FROM pet where owner = ?'
+        },
 		params: [ "ownerid" ]
-
 	},
 
 	speciessection: {
 		template: {
 			_value : "$species"
 		},
-                query: {
+        query: {
 		    sql: 'SELECT * from species where speciesid = ?'
-                },
+        },
 		params : [ "species" ]
-
 	}
-
 }
