@@ -28,8 +28,8 @@
 			species : "@speciessection"
 		},
 		query:{
-		    sql: 'SELECT * FROM pet where owner = ?'
-        },
+			sql: 'SELECT * FROM pet where owner = ?'
+		},
 		params: [ "ownerid" ]
 	},
 
@@ -37,9 +37,9 @@
 		template: {
 			_value : "$species"
 		},
-        query: {
-		    sql: 'SELECT * from species where speciesid = ?'
-        },
+		query: {
+			sql: 'SELECT * from species where speciesid = ?'
+		},
 		params : [ "species" ]
 	}
 }
