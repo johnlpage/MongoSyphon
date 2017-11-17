@@ -1,23 +1,24 @@
 {
-	databaseConnection: "jdbc:mysql://localhost:3306/sdemo?useSSL=false",
-	databaseUser: "root",
-	databasePassword: "password",
-	mongoConnection: "mongodb://localhost:27017/",
-	mongoDatabase: "sdemo",
-	mongoCollection: "owners",
-
-	startAt: "ownerssection",
-
-
-	ownerssection: {
+	start: {
+		source: {
+			uri:  "jdbc:mysql://localhost:3306/sdemo?useSSL=false",
+			user: "root",
+			password: "password"
+		},
+		target: {
+			mode: "insert",
+			uri: "mongodb://localhost:27017/",
+			namespace: "sdemo.owners"
+		},
 		template: {
 			_id: "$ownerid",
 			name: "$name",
 			address : "$address",
 			pets : [ "@petsection" ]
 		},
-		sql: 'SELECT * FROM owner',
-
+		query:{
+		   sql: 'SELECT * FROM owner'
+		}
 	},
 
 
@@ -27,7 +28,9 @@
 			name: "$name",
 			species : "@speciessection"
 		},
-		sql: 'SELECT * FROM pet where owner = ?',
+                query:{
+		sql: 'SELECT * FROM pet where owner = ?'
+                },
 		params: [ "ownerid" ]
 
 	},
@@ -36,7 +39,9 @@
 		template: {
 			_value : "$species"
 		},
-		sql: 'SELECT * from species where speciesid = ?',
+                query: {
+		    sql: 'SELECT * from species where speciesid = ?'
+                },
 		params : [ "species" ]
 
 	}
