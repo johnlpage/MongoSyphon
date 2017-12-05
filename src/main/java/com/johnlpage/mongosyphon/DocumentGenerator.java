@@ -453,30 +453,29 @@ public class DocumentGenerator {
 	}
 	
 	private void initTransformers() {
-	    for (Object transConfig : documentTransformersConfig) {
-	        if (transConfig instanceof Document) {
-	            Document transConfigDoc = (Document)transConfig;
-	            String className = transConfigDoc.getString("className");
-	            if (className != null) {
-	                try {
-	                    Object transformer = Class.forName(className).newInstance();
-	                    if (transformer instanceof IDocumentTransformer) {
-	                        this.documentTransformers.add((IDocumentTransformer)transformer);
-	                    } else {
-	                        logger.warn("documentTransformer not instance of IDocumentTransformer, ignoring");
-	                    }
-	                } catch (Exception e) {
-	                    logger.error("Error instantiating documentTransformer " + className, e);
-	                    System.exit(1);
-	                }
-	            }
-	        } else {
-                logger.warn(
-                        String.format("Invalid documentTransformers config, expected Document but was %s. Ignoring.",
-                                transConfig.getClass().getName()));
-	        }
-	    }
-	    
+		for (Object transConfig : documentTransformersConfig) {
+			if (transConfig instanceof Document) {
+				Document transConfigDoc = (Document) transConfig;
+				String className = transConfigDoc.getString("className");
+				if (className != null) {
+					try {
+						Object transformer = Class.forName(className).newInstance();
+						if (transformer instanceof IDocumentTransformer) {
+							this.documentTransformers.add((IDocumentTransformer) transformer);
+						} else {
+							logger.warn("documentTransformer not instance of IDocumentTransformer, ignoring");
+						}
+					} catch (Exception e) {
+						logger.error("Error instantiating documentTransformer " + className, e);
+						System.exit(1);
+					}
+				}
+			} else {
+				logger.warn(
+						String.format("Invalid documentTransformers config, expected Document but was %s. Ignoring.",
+								transConfig.getClass().getName()));
+			}
+		}
 
 	}
 }
