@@ -221,7 +221,7 @@ In future parallel generation of codepentant records into multiple collections t
 
 ####  Sections and the start point
 
-The config file is divided into named _sections_. Every config file must have a sectiopn called _start_  which is the first section processes. A section defines a SQL Query, Mongo Query or Aggregation, a Template, a Parameters section if required and any cacheing/execution options.
+The config file is divided into named _sections_. Every config file must have a section called _start_  which is the first section processes. A section defines a SQL Query, Mongo Query or Aggregation, a Template, a Parameters section if required and any cacheing/execution options.
 
 A section can have a source, target, query and template.
 
@@ -285,7 +285,7 @@ The target specifies either a MongoDB URI and namespace to write to or an output
 
 |Option|Description|Mandatory|
 |------|-----------|---------|
-|mode| one of insert,upsert,update,JSON, XML or subsection|No|
+|mode| one of insert,upsert,update,save,JSON, XML or subsection|No|
 | uri| A MongoDB Connection string to the database of your choice, you must have an appropriate driver jar in your classpath for an RDBMS, mysql and postgres build with MongoSyphon and are in it's JAR|Yes|
 user| A user who can log in and read from the RDBMS| Yes |
 |password|A password for the user above , for MongoDB put it in the connection string instead| Yes |
@@ -380,7 +380,7 @@ Or we may want a more nested schema from that single row - like this
 Which is also valid.
 
 
-We can also embed an object from a sub-section by calling the subsection but _not including the square brackets_ this causes the subsection to be evaluated _only for the first matching value_. In our pets example we may do this for a lookup table like the pet's species like so. This shoudl only be used normally where you *know* there is only a single matching value.
+We can also embed an object from a sub-section by calling the subsection but _not including the square brackets_ this causes the subsection to be evaluated _only for the first matching value_. In our pets example we may do this for a lookup table like the pet's species like so. This should only be used normally where you *know* there is only a single matching value.
 
 
 ```
@@ -428,11 +428,11 @@ This would result in a document like:
 
 #### Scalar Values
 
-Sometimes you have only a single value you are interested in being retiurned from a sub-section. This can be the case regardless of whther it is being returned to an array or a scalar at a higher level - you don't want to return an object as it will have a single member.
+Sometimes you have only a single value you are interested in being returned from a sub-section. This can be the case regardless of whther it is being returned to an array or a scalar at a higher level - you don't want to return an object as it will have a single member.
 
-Mongosyphon lets us use the special value `_value` to denote that the output of this section shoudl not be an object but in fact a scalar.
+Mongosyphon lets us use the special value `_value` to denote that the output of this section should not be an object but in fact a scalar.
 
-This is often the case when the section relates to a lookup table. If, in our example above, we did not have _species_ *and* _breed_ for each pet but just the species then we may choose to define it defferently. By putting the species values into `_value` we can get a different output.
+This is often the case when the section relates to a lookup table. If, in our example above, we did not have _species_ *and* _breed_ for each pet but just the species then we may choose to define it differently. By putting the species values into `_value` we can get a different output.
 
 
 
@@ -483,7 +483,7 @@ Note that _type_ is not a String value not an object.
 
 The default mode in mongosyphon is to perform standalone queries (using pre-prepared statements and pooled connections for efficiency) to retrieve each lower section. In some cases this can result in the same query being performed many times - for example retrieving the "species = cat" data in the above example for each cat in the database.
 
-Most RDBMS will cache frequent queries like this but there is still considerable overhead in round trips to the server, preparing the query etc. Mongosyphone allos you to cache a section at the client side if it is expected to return a relatively small number of discrete results. For example we know there are only a few pet species so we can add the parameter `cached: true` in the section. Using this will cause MongoSyphon to cache the output for each set of input params and greatly reduce calls to the server.
+Most RDBMS will cache frequent queries like this but there is still considerable overhead in round trips to the server, preparing the query etc. Mongosyphon allows you to cache a section at the client side if it is expected to return a relatively small number of discrete results. For example we know there are only a few pet species so we can add the parameter `cached: true` in the section. Using this will cause MongoSyphon to cache the output for each set of input params and greatly reduce calls to the server.
 
 Be aware that you can cache any size of sub or nested object but the cache will require RAM and will grow with each new entry there is no cache eviction.
 
@@ -495,9 +495,9 @@ To do this we need to ensure both sections are sorted by the field we are using 
 
 We can then use 'mergeon' to walk both tables merging the results.
 
-_behind the scenes, MongoSyphon simply keeps the cursor open for the sub document and assumes any results it is looking for will be odered at the point it previously left off_
+_behind the scenes, MongoSyphon simply keeps the cursor open for the sub document and assumes any results it is looking for will be ordered at the point it previously left off_
 
-Our pet's config, using this efficient merging mechnism, which avoids a query on the pets table per owner looks like this.
+Our pet's config, using this efficient merging mechanism, which avoids a query on the pets table per owner looks like this.
 
 ```
 	ownerssection: {
@@ -530,7 +530,7 @@ This typically requires you have an index on the column being sorted however tha
 
 ### Pushing transformation work  to SQL
 
-All the previous examples have used simple SQL statements against a single database. The reason the JOIN operations have not been pushed ot the underlying database is that there is rarely a good and efficient way to do that for a 1 to Many relationship. You either have to retrieve repeated columns for many rows or use somethign like MySQL's **GROUP_CONCAT** function and then parse a text string.
+All the previous examples have used simple SQL statements against a single database. The reason the JOIN operations have not been pushed ot the underlying database is that there is rarely a good and efficient way to do that for a 1 to Many relationship. You either have to retrieve repeated columns for many rows or use something like MySQL's **GROUP_CONCAT** function and then parse a text string.
 
 For Many to Many and One to One relationships, sometimes it is better to push some logic into the SQL query and MongoSyphon imploses no limits on this other than your own SQL abilities.
 
@@ -550,15 +550,62 @@ sql: 'SELECT ACTOR.NAME as NAME ,ACTORS2MOVIES.ROLE AS ROLE
 		 ACTORS.ACTORID=ACTORS2MOVIES.ACTORID'
 ```
 
+### Java transformations
+
+Mongosyphon now supports document transformations which can be performed in Java code via a series of transformers which can be applied
+prior to the document being inserted or updated. The transformer can be any Java class which implements the `com.johnlpage.mongosyphon.IDocumentTransformer` interface and has a default / no-args constructor. The final source document before insertion will be
+passed to the `transform()` method, which should perform any modifications desired on that source document. Below is a very basic example of
+a transformer which will add a new field to the document called `fullNameUpper` consisting of the upper-cased contentation of the document
+fields `firstName` and `lastName`. The transformer will also remove the document field `somethingExtra`.
+
+```
+package com.johnlpage.mongosyphon.transformer.custom;
+import org.bson.Document;
+import com.johnlpage.mongosyphon.IDocumentTransformer;
+
+public class TestTransform implements IDocumentTransformer {
+
+    public void transform(Document source) {
+        String firstName = source.getString("firstName");
+        String lastName = source.getString("lastName");
+        String fullNameUpper = (firstName + " " + lastName).toUpperCase(); 
+        source.put("fullNameUpper", fullNameUpper);
+        source.remove("somethingExtra");
+    }
+}
+```
+
+Configure the transformer(s) via the `documentTransformers` element, for example: 
+
+```
+{
+    start: {
+        source: {...},
+        target: {...},
+        template: {...},
+        query:{...},
+        documentTransformers: [
+            {className: "com.johnlpage.mongosyphon.transformer.custom.TestTransform"}
+        ]
+    },
+    ...
+}
+```
+
+**NOTE** that transformers are currently only applied to top level document and will not be applied/processed for any subsection. This allows the entire document to be modified in it's final state (after subsections have been applied) before being output.
+
 ### Updates and Inserts
 
 All previous examples have used the target `mode` of insert.
 
-It is possible to use MongoSyphon to update an existing MongoDB database as well to so this use `mode: "update"` or `mode: "upsert"` as target level parameters depending on the behaviour you desire where no match is found.
+It is possible to use MongoSyphon to update an existing MongoDB database as well. To do so this use `mode: "update"`, `mode: "upsert"`,
+or `mode: "save"` as target level parameters depending on the behaviour you desire.
 
-There is no 'replace/save' mode currently in MongoSyphon although this is being considered for the next version.
+The `mode: "save"` option follows the same semantics that `save()` uses in the mongo shell or driver methods. If the document 
+provided does not contain an `_id` field, then an insert will be performed. Otherwise, if the document contains an `_id` field
+an upsert will be performed which will either insert a new document (if one does not exist) or overwrite an existing document.
 
-When using either updating mode the format of the top level document is different it must be of the form:
+When using `mode: "update"` or `mode: "upsert"` the format of the top level document is different, it must be of the form:
 
 ```
 someupdatesection: {
@@ -571,7 +618,7 @@ someupdatesection: {
 query: { sql: 'select X from Y' }
 }
 ```
-The template should correspond to a MongoDB update document specificatioin using one of more update operators. The exception is the "$find" operator which specifies which *single* document to find an update. Currently multi-update is not supported.
+The template should correspond to a MongoDB update document specification using one of more update operators. The exception is the "$find" operator which specifies which *single* document to find an update. Currently multi-update is not supported.
 
 By using the $ operator you can create update specifications which query an RDBMS table and then push updates into nested documents and arrays in MongoDB. For example if we now had a collection mapping pet_id's to microchip numbers we could push those through to update the pet records, or push them unto an array under the owner.
 
