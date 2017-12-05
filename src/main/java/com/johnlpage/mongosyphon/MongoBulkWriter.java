@@ -35,7 +35,6 @@ public class MongoBulkWriter {
 	public MongoBulkWriter(String URI, String namespace)
 	{
 		logger = LoggerFactory.getLogger(MongoBulkWriter.class);
-
 		logger.info("Connecting to " + URI );
 		mongoClient = new MongoClient(new MongoClientURI(URI));
 		String[] parts = namespace.split("\\.");
