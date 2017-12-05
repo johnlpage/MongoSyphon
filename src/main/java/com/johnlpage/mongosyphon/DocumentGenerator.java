@@ -3,6 +3,7 @@ package com.johnlpage.mongosyphon;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bson.Document;
 import org.json.JSONObject;
@@ -24,6 +25,8 @@ public class DocumentGenerator {
 	Document section = null;
 	Document template = null;
 	Document params = null;
+	List<?> documentTransformersConfig = null;
+	List<IDocumentTransformer> documentTransformers = new ArrayList<IDocumentTransformer>();
 	String targetMode = null;
 	MongoBulkWriter mongoTarget = null;
 	Boolean hasRows = false;
@@ -55,6 +58,10 @@ public class DocumentGenerator {
 				System.exit(1);
 			}
 			this.section.put("source", parentSource);
+		}
+		this.documentTransformersConfig = this.section.get("documentTransformers", List.class);
+		if (this.documentTransformersConfig != null) {
+		    initTransformers();
 		}
 		connectToSource(this.section.get("source", Document.class));
 		connectToTarget(this.section.get("target", Document.class));
@@ -90,7 +97,8 @@ public class DocumentGenerator {
 		}
 		if (targetMode.equalsIgnoreCase("insert")
 				|| targetMode.equalsIgnoreCase("update")
-				|| targetMode.equalsIgnoreCase("upsert")) {
+				|| targetMode.equalsIgnoreCase("upsert")
+				|| targetMode.equalsIgnoreCase("save")) {
 			String targetURI = target.getString("uri");
 			if (targetURI == null) {
 				logger.error("Target needs a URI in section " + sectionName);
@@ -157,11 +165,13 @@ public class DocumentGenerator {
 		int lastcount = 0;
 		int currcount = 0;
 		while (doc != null) {
+		    for (IDocumentTransformer t : documentTransformers) {
+	            t.transform(doc);
+	        }
 			if (targetMode.equalsIgnoreCase("subsection")) {
 
 				String subsectionName = section.get("target", Document.class)
 						.getString("uri");
-
 				DocumentGenerator subgen;
 				if (docGens.containsKey(subsectionName)) {
 					subgen = docGens.get(subsectionName);
@@ -196,7 +206,9 @@ public class DocumentGenerator {
 					mongoTarget.Update(doc, false);
 				} else if (targetMode.equalsIgnoreCase("upsert")) {
 					mongoTarget.Update(doc, true);
-				} else {
+				} else if (targetMode.equalsIgnoreCase("save")) {
+                    mongoTarget.Save(doc);
+                } else {
 					logger.error("Unknown mode " + targetMode);
 					logger.error(
 							"Should be one of insert,update,upsert,JSON,XML");
@@ -438,5 +450,33 @@ public class DocumentGenerator {
 
 		}
 		return rval;
+	}
+	
+	private void initTransformers() {
+	    for (Object transConfig : documentTransformersConfig) {
+	        if (transConfig instanceof Document) {
+	            Document transConfigDoc = (Document)transConfig;
+	            String className = transConfigDoc.getString("className");
+	            if (className != null) {
+	                try {
+	                    Object transformer = Class.forName(className).newInstance();
+	                    if (transformer instanceof IDocumentTransformer) {
+	                        this.documentTransformers.add((IDocumentTransformer)transformer);
+	                    } else {
+	                        logger.warn("documentTransformer not instance of IDocumentTransformer, ignoring");
+	                    }
+	                } catch (Exception e) {
+	                    logger.error("Error instantiating documentTransformer " + className, e);
+	                    System.exit(1);
+	                }
+	            }
+	        } else {
+                logger.warn(
+                        String.format("Invalid documentTransformers config, expected Document but was %s. Ignoring.",
+                                transConfig.getClass().getName()));
+	        }
+	    }
+	    
+
 	}
 }
