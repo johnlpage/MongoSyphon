@@ -17,6 +17,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.InsertOneModel;
+import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.WriteModel;
@@ -34,8 +35,7 @@ public class MongoBulkWriter {
 	
 	public MongoBulkWriter(String URI, String namespace)
 	{
-		logger = LoggerFactory.getLogger(MongoSyphon.class);
-
+		logger = LoggerFactory.getLogger(MongoBulkWriter.class);
 		logger.info("Connecting to " + URI );
 		mongoClient = new MongoClient(new MongoClientURI(URI));
 		String[] parts = namespace.split("\\.");
@@ -77,6 +77,18 @@ public class MongoBulkWriter {
 			logger.error("No $find section defined");
 			System.exit(1);
 		}
+		FlushOpsIfFull();
+	}
+	
+	public void Save(Document doc) {
+		if (!doc.containsKey("_id")) {
+			Create(doc);
+			return;
+		}
+		Document find = new Document("_id", doc.get("_id"));
+		UpdateOptions uo = new UpdateOptions();
+		uo.upsert(true);
+		ops.add(new ReplaceOneModel<Document>(find, doc, uo));
 		FlushOpsIfFull();
 	}
 	

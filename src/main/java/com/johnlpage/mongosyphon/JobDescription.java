@@ -27,6 +27,10 @@ public class JobDescription {
 
 			System.exit(1);
 		}
+		
+		// Handle \ followed by newline as line continuation
+		config = config.replaceAll("\\\\\n", "");
+		
 		// Better errors from this parser
 		try {
 			@SuppressWarnings("unused")
