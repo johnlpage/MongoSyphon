@@ -1,6 +1,13 @@
 package com.johnlpage.mongosyphon;
 
-import java.sql.*;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -108,8 +115,9 @@ public class RDBMSConnection implements IDataSource {
 						stmt.setDate(count, (Date) o);
 					} else if (o.getClass() == Integer.class) {
 						stmt.setInt(count, (Integer) o);
-		
-					}
+					} else if (o.getClass() == BigDecimal.class) {
+                        stmt.setBigDecimal(count, (BigDecimal)o);
+                    }
 					count++;
 				}
 			}
