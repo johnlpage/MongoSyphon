@@ -27,6 +27,7 @@ public class RDBMSConnection implements IDataSource {
 	Document cachedRow=null;
 	String paramtext=null;
 	Document prevRow=null;
+	boolean isMySQL=false;
 	
 	/* (non-Javadoc)
 	 * @see com.johnlpage.mongosyphon.IDataSource#close()
@@ -47,6 +48,10 @@ public class RDBMSConnection implements IDataSource {
 	public RDBMSConnection(String connectionString,boolean usecache) {
 		logger = LoggerFactory.getLogger(RDBMSConnection.class);
 		this.connectionString = connectionString;
+		if(connectionString.contains("mysql://")) {
+			isMySQL = true;
+			logger.info("Source is MySQL");
+		}
 		if(usecache)
 		{ //Cannot merge AND cache
 			cache =  new HashMap<String,Document>();
@@ -89,7 +94,11 @@ public class RDBMSConnection implements IDataSource {
 			              java.sql.ResultSet.CONCUR_READ_ONLY); // Only create a
 															// prepared
 															// statement once
-				stmt.setFetchSize(Integer.MIN_VALUE);
+				//Only do this bit for MySQL
+				//Forces server side cursors
+				if(isMySQL) {
+					stmt.setFetchSize(Integer.MIN_VALUE);
+				}
 
 			}
 			// Parameterise every time as we are calling with different values
@@ -191,7 +200,22 @@ public class RDBMSConnection implements IDataSource {
 		Document row = new Document();
 
 		for (int i = 1; i <= columnCount; ++i) {
-			row.put(metaData.getColumnLabel(i), results.getObject(i));
+			Object o = results.getObject(i);
+			
+			if(o instanceof java.sql.Date )
+			{
+			   java.sql.Date sd = (java.sql.Date)o;
+			   
+			   o = new java.util.Date(sd.getTime());
+			}
+			
+			if(o instanceof java.sql.Timestamp )
+			{
+			   java.sql.Timestamp sd = (java.sql.Timestamp)o;
+			   o = new java.util.Date(sd.getTime());
+			}
+			
+			row.put(metaData.getColumnLabel(i), o);
 		}
 		if(cache != null && paramtext != null) {
 			cache.put(paramtext, row);

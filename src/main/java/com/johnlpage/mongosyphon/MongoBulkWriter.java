@@ -16,6 +16,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.UpdateOneModel;
@@ -98,7 +99,8 @@ public class MongoBulkWriter {
 		if(ops.size() > MongoBulkWriter.BATCHSIZE )
 		{
 			try {
-				collection.bulkWrite(ops);
+				//Now NOT ordered
+				collection.bulkWrite(ops, new BulkWriteOptions().ordered(false));
 			}  catch (com.mongodb.MongoBulkWriteException err) {
 				//  Duplicate inserts are not an error if retrying
 				for (BulkWriteError bwerror : err.getWriteErrors()) {
@@ -108,9 +110,10 @@ public class MongoBulkWriter {
 						logger.error(bwerror.getMessage());
 						fatalerror = true;
 						break;
+					} else {
+						logger.warn("Attempt to load records with DUPLICATE _id fields");
+						logger.warn(bwerror.getMessage());
 					}
-				}
-				if (!fatalerror) {
 				}
 			} catch (MongoException err) {
 				// This is some other type of error not a BulkWriteError
