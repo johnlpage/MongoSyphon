@@ -1,6 +1,8 @@
 package com.johnlpage.mongosyphon;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,12 +12,6 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.BufferedOutputStream;
-
-import java.io.FileOutputStream;
-
-import java.io.IOException;
-import java.io.PrintStream;
 
 public class DocumentGenerator {
 	private IDataSource connection = null;
@@ -303,7 +299,7 @@ public class DocumentGenerator {
 			String bits[] = mergeFields.split("\\=");
 			String mergeFrom ;
 			String mergeTo = bits[0];
-			if(bits.length > 0) {
+			if(bits.length > 1) {
 				 mergeFrom = bits[1];
 			} else {
 				 mergeFrom = bits[0];
@@ -312,7 +308,7 @@ public class DocumentGenerator {
 			// Params is the row above
 			if (params.containsKey(mergeFrom) && row != null
 					&& row.containsKey(mergeTo)) {
-				int compval = -1;
+				long compval = -1;
 				Object parent = params.get(mergeFrom);
 				Object child = row.get(mergeTo);
 				if (parent.getClass() == child.getClass()) {
@@ -322,6 +318,8 @@ public class DocumentGenerator {
 						compval = a.compareTo(b);
 					} else if (parent.getClass() == Integer.class) {
 						compval = (Integer) child - (Integer) parent;
+					}else if (parent.getClass() == Long.class) {
+						compval = (Long) child - (Long) parent;
 					}
 				}
 				// Loop again whilst we haven't found one

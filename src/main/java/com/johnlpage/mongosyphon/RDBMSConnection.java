@@ -32,8 +32,9 @@ public class RDBMSConnection implements IDataSource {
 	Map<String,Document> cache=null;
 	Boolean incache = false;
 	Document cachedRow=null;
-	String stmttext=null;
+	String paramtext=null;
 	Document prevRow=null;
+	boolean isMySQL=false;
 	
 	/* (non-Javadoc)
 	 * @see com.johnlpage.mongosyphon.IDataSource#close()
@@ -54,6 +55,10 @@ public class RDBMSConnection implements IDataSource {
 	public RDBMSConnection(String connectionString,boolean usecache) {
 		logger = LoggerFactory.getLogger(RDBMSConnection.class);
 		this.connectionString = connectionString;
+		if(connectionString.contains("mysql://")) {
+			isMySQL = true;
+			logger.info("Source is MySQL");
+		}
 		if(usecache)
 		{ //Cannot merge AND cache
 			cache =  new HashMap<String,Document>();
@@ -96,13 +101,19 @@ public class RDBMSConnection implements IDataSource {
 			              java.sql.ResultSet.CONCUR_READ_ONLY); // Only create a
 															// prepared
 															// statement once
-				stmt.setFetchSize(Integer.MIN_VALUE);
+				//Only do this bit for MySQL
+				//Forces server side cursors
+				if(isMySQL) {
+					stmt.setFetchSize(Integer.MIN_VALUE);
+				}
 
 			}
 			// Parameterise every time as we are calling with different values
 			int count = 1;
+			paramtext=new String();
 			if(params != null)
 			{
+				
 				for (String p : params) {
 					Object o = parent.get(p);
 					if(o == null) {
@@ -111,13 +122,22 @@ public class RDBMSConnection implements IDataSource {
 					}
 					if (o.getClass() == String.class) {
 						stmt.setString(count, (String) o);
+						paramtext = paramtext + "::"+o;
 					} else if (o.getClass() == Date.class) {
 						stmt.setDate(count, (Date) o);
+						paramtext = paramtext + "::"+o;
 					} else if (o.getClass() == Integer.class) {
 						stmt.setInt(count, (Integer) o);
 					} else if (o.getClass() == BigDecimal.class) {
                         stmt.setBigDecimal(count, (BigDecimal)o);
-                    }
+           
+						paramtext = paramtext + "::"+o;
+					}else if (o.getClass() == Long.class) {
+						stmt.setLong(count, (Long) o);
+						paramtext = paramtext + "::"+o;
+					} else {
+						logger.error("Parameter " + p + " is of type " + o.getClass().getName() + " which is not supported");
+					}
 					count++;
 				}
 			}
@@ -127,20 +147,22 @@ public class RDBMSConnection implements IDataSource {
 		}
 		
 		//If we have this cached simply return it
-		//In theory we should just use a representation of the params
-		stmttext = stmt.toString();
+		
+		//In some JDBC stmttext isnt populated with params
+		//stmttext = stmt.toString();
+		
 		if(cache != null) {
-			if(cache.containsKey(stmttext)) {
+			if(cache.containsKey(paramtext)) {
 				results=null;
 				metaData=null;
 				columnCount=-1;
 				incache=true;
-				cachedRow = cache.get(stmttext);
+				cachedRow = cache.get(paramtext);
 				return;//Don't 
 			}
 		}
 		incache=false;
-		logger.info("executing " + stmttext);
+		//logger.info("executing " + stmttext);
 		try {
 
 			results = stmt.executeQuery();
@@ -188,10 +210,25 @@ public class RDBMSConnection implements IDataSource {
 		Document row = new Document();
 
 		for (int i = 1; i <= columnCount; ++i) {
-			row.put(metaData.getColumnLabel(i), results.getObject(i));
+			Object o = results.getObject(i);
+			
+			if(o instanceof java.sql.Date )
+			{
+			   java.sql.Date sd = (java.sql.Date)o;
+			   
+			   o = new java.util.Date(sd.getTime());
+			}
+			
+			if(o instanceof java.sql.Timestamp )
+			{
+			   java.sql.Timestamp sd = (java.sql.Timestamp)o;
+			   o = new java.util.Date(sd.getTime());
+			}
+			
+			row.put(metaData.getColumnLabel(i), o);
 		}
-		if(cache != null && stmttext != null) {
-			cache.put(stmttext, row);
+		if(cache != null && paramtext != null) {
+			cache.put(paramtext, row);
 		}
 		return row;
 	}
