@@ -696,7 +696,12 @@ start : {
 },
 
 "moviessection": {
-    "template": {
+    source: {	
+    	uri:  "jdbc:mysql://localhost:3306/sdemo?useSSL=false",
+	user: "root",
+	password: "password"
+	},
+   "template": {
       "_id": "$movieid",
       "title": "$title",
       "year": "$year",
