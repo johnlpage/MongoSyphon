@@ -12,3 +12,5 @@
 hs_err_pid*
 /target/
 MongoSyphon.log
+.settings/org.eclipse.jdt.core.prefs
+.settings/org.eclipse.jdt.apt.core.prefs
