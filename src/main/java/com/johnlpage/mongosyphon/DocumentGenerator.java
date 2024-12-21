@@ -78,7 +78,7 @@ public class DocumentGenerator {
 			logger.error("no target mode defined in " + sectionName);
 			System.exit(1);
 		}
-		if (targetMode.equalsIgnoreCase("json")
+		if (targetMode.equalsIgnoreCase("json")|| targetMode.equalsIgnoreCase("ejson")
 				|| targetMode.equalsIgnoreCase("xml")) {
 			String uri = target.getString("uri");
 			if(uri != null  && uri.startsWith("file://"))
