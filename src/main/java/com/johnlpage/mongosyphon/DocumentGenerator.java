@@ -3,11 +3,15 @@ package com.johnlpage.mongosyphon;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.json.Converter;
+import org.bson.json.JsonMode;
+import org.bson.json.JsonWriterSettings;
 import org.json.JSONObject;
 import org.json.XML;
 import org.slf4j.Logger;
@@ -156,6 +160,18 @@ public class DocumentGenerator {
 
 		long lasttime = System.currentTimeMillis();
 
+		   // Define custom date converter
+        Converter<Long> dateToStringConverter = (value, writer) -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            writer.writeString(sdf.format(value));
+        };
+		
+ 		JsonWriterSettings simpleJSONSettings = JsonWriterSettings.builder()
+                .outputMode(JsonMode.RELAXED)
+                .dateTimeConverter(dateToStringConverter)
+                .build();
+
+
 		Document doc = getNext();
 
 		int lastcount = 0;
@@ -179,21 +195,27 @@ public class DocumentGenerator {
 					docGens.put(subsectionName, subgen);
 				}
 				subgen.runConversion();
-			} else if (targetMode.equalsIgnoreCase("JSON")) {
-				// TODO: This can be way nicer JSON
+			} else if (targetMode.equalsIgnoreCase("EJSON")) {
+				// Defaults to EJSON
 				if(outputStream== null){
 				System.out.println(doc.toJson());
 				} else {
 					outputStream.println(doc.toJson());
 				}
-			} else if (targetMode.equalsIgnoreCase("XML")) {
+			} else if (targetMode.equalsIgnoreCase("JSON")) {
+				if(outputStream== null){
+				System.out.println(doc.toJson(simpleJSONSettings));
+				} else {
+					outputStream.println(doc.toJson(simpleJSONSettings));
+				}
+			}  else if (targetMode.equalsIgnoreCase("XML")) {
 				// TODO: Add seom XML conversion options
 				// As this is poor
 				String xml = XML.toString(new JSONObject(doc));
 				if(outputStream == null) {
 				System.out.println(xml); }
 				else {
-					outputStream.println(doc.toJson());
+					outputStream.println(xml);
 				}
 			} else {
 				if (targetMode.equalsIgnoreCase("insert")) {
